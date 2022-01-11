@@ -58,11 +58,22 @@ class CrimeFragment: Fragment() {
             })
     }
 
+
+    private fun updateUI(){
+        titleField.setText(crime.title )
+        dateButton.text = crime.date.toString()
+        solveCheckBox.apply {
+            isChecked = crime.isSolved
+            jumpDrawablesToCurrentState()
+        }
+    }
+
+
     override fun onStart() {
         super.onStart()
         val titleWatcher = object: TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                TODO("Not yet implemented")
+
             }
 
             override fun onTextChanged(sequence: CharSequence?, start: Int, before: Int, count: Int) {
@@ -70,7 +81,7 @@ class CrimeFragment: Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                TODO("Not yet implemented")
+
             }
 
         }
@@ -82,14 +93,12 @@ class CrimeFragment: Fragment() {
         }
     }
 
-    private fun updateUI(){
-      titleField.setText(crime.title )
-        dateButton.text = crime.date.toString()
-        solveCheckBox.apply {
-            isChecked = crime.isSolved
-            jumpDrawablesToCurrentState()
-        }
+    override fun onStop() {
+        super.onStop()
+        crimeDetailViewModel.saveCrime(crime)
     }
+
+
 
 
     companion object {
