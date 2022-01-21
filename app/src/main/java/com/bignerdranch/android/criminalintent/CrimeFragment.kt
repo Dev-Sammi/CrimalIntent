@@ -3,9 +3,7 @@ package com.bignerdranch.android.criminalintent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -27,8 +25,11 @@ class CrimeFragment: Fragment() {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         crime = Crime()
         val crimeid: UUID = arguments?.getSerializable(ARG_CRIME_ID) as UUID
         crimeDetailViewModel.loadCrime(crimeid)
