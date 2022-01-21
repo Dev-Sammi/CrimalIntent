@@ -72,6 +72,9 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.1.1"
     implementation "com.google.android.material:material:1.4.0"
 
+    //Fragment
+    implementation "androidx.fragment:fragment-ktx:1.4.0"
+
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"

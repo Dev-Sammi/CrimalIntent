@@ -43,10 +43,19 @@ class CrimeFragment: Fragment() {
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
         dateButton.setOnClickListener {
-            DatePickerFragment.newInstance(crime.date).apply {
-                setTargetFragment(this@CrimeFragment, REQUEST_DATE)
-                show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
+            val fragmentManager = requireActivity().supportFragmentManager
+            val datePickerFragment = DatePickerFragment.newInstance(crime.date)
+
+            fragmentManager.setFragmentResultListener("FRAGMENT_RESULT_KEY",viewLifecycleOwner){
+                    resultKey, bundle -> if(resultKey == "FRAGMENT_RESULT_KEY"){
+                    val date = bundle.getSerializable("DATE_PICKER_BUNDLE_KEY") as Date
+                    crime.date = date
+                    updateUI()
+                }
             }
+
+            datePickerFragment.show(fragmentManager, "Date_Picker_Fragment")
+
         }
         solveCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
         return view
