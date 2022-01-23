@@ -1,8 +1,11 @@
 package com.bignerdranch.android.criminalintent
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
@@ -15,12 +18,16 @@ private const val ARG_CRIME_ID = "crime_id"
 private const val TAG = "CrimeFragment"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
+private const val DATE_FORMAT = "EEE, MMM, dd"
+private const val REQUEST_CONTACT = 1
 
 class CrimeFragment: Fragment() {
     private lateinit var crime: Crime
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
     private lateinit var solveCheckBox: CheckBox
+    private lateinit var reportButton: Button
+    private lateinit var suspectButton: Button
     private val crimeDetailViewModel : CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
     }
@@ -43,6 +50,8 @@ class CrimeFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_crime,container,false)
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
+        reportButton = view.findViewById(R.id.crime_report) as Button
+        suspectButton = view.findViewById(R.id.crime_suspect) as Button
         dateButton.setOnClickListener {
             val fragmentManager = requireActivity().supportFragmentManager
             val datePickerFragment = DatePickerFragment.newInstance(crime.date)
@@ -105,6 +114,24 @@ class CrimeFragment: Fragment() {
             setOnCheckedChangeListener { _, isChecked ->
             crime.isSolved = isChecked}
         }
+
+        reportButton.setOnClickListener {
+            Intent(Intent.ACTION_SEND).apply {
+                type =  "text/plain"
+                putExtra(Intent.EXTRA_TEXT, getCrimeReport())
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+            }.also { intent ->
+                val chooserIntent = Intent.createChooser(intent, getString(R.string.send_report))
+                startActivity(chooserIntent)
+            }
+        }
+
+        suspectButton.apply {
+            val pickContactIntent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+            setOnClickListener {
+                startActivityForResult(pickContactIntent, REQUEST_CONTACT)
+            }
+        }
     }
 
     override fun onStop() {
@@ -112,7 +139,21 @@ class CrimeFragment: Fragment() {
         crimeDetailViewModel.saveCrime(crime)
     }
 
-
+    private fun getCrimeReport(): String {
+        val solvedString = if (crime.isSolved) {
+            getString(R.string.crime_report_solved)
+        } else {
+            getString(R.string.crime_report_unsolved)
+        }
+        val dateString = DateFormat.format(DATE_FORMAT, crime.date).toString()
+        var suspect = if (crime.suspect.isBlank()) {
+            getString(R.string.crime_report_no_suspect)
+        } else {
+            getString(R.string.crime_report_suspect, crime.suspect)
+        }
+        return getString(R.string.crime_report,
+            crime.title, dateString, solvedString, suspect)
+    }
 
 
     companion object {
